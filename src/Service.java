@@ -1,0 +1,67 @@
+package src;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Service {
+    static class Ticket {
+        @JsonProperty("origin")
+        String origin;
+        @JsonProperty("destination")
+        String destination;
+        @JsonProperty("departure_time")
+        String departure_time;
+        @JsonProperty("arrival_time")
+        String arrival_time;
+        @JsonProperty("carrier")
+        String carrier;
+        @JsonProperty("price")
+        int price;
+    }
+
+    static class Tickets {
+        @JsonProperty("tickets")
+        List<Ticket> tickets;
+    }
+
+    public static void main(String[] args) throws Exception {
+        // Чтение JSON
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        Tickets ticketsData = mapper.readValue(new File("tickets.json"), Tickets.class);
+        List<Ticket> tickets = ticketsData.tickets.stream()
+                .filter(t -> t.origin.equals("VVO") && t.destination.equals("TLV"))
+                .collect(Collectors.toList());
+
+        // Формат времени
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+
+        // Минимальное время полета для каждого перевозчика
+        Map<String, Long> minFlightTimes = new HashMap<>();
+        for (Ticket t : tickets) {
+            long duration = timeFormat.parse(t.arrival_time).getTime() - timeFormat.parse(t.departure_time).getTime();
+            duration = duration < 0 ? duration + 24 * 60 * 1000 : duration; // Учет перехода через сутки
+            long minutes = duration / (1000 * 60);
+            minFlightTimes.merge(t.carrier, minutes, Math::min);
+        }
+
+        // Вывод минимального времени полета
+        System.out.println("Минимальное время полета (Владивосток -> Тель-Авив) для каждого перевозчика:");
+        minFlightTimes.forEach(
+                (carrier, minutes) -> System.out.printf("%s: %d ч %d мин\n", carrier, minutes / 60, minutes % 60));
+
+        // Расчет средней цены и медианы
+        List<Integer> prices = tickets.stream().map(t -> t.price).sorted().collect(Collectors.toList());
+        double average = prices.stream().mapToInt(Integer::intValue).average().orElse(0);
+        double median = prices.size() % 2 == 0
+                ? (prices.get(prices.size() / 2 - 1) + prices.get(prices.size() / 2)) / 2.0
+                : prices.get(prices.size() / 2);
+
+        // Вывод разницы между средней ценой и медианой
+        System.out.printf("\nРазница между средней ценой и медианой: %.1f\n", Math.abs(average - median));
+    }
+}
