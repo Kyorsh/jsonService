@@ -1,6 +1,5 @@
 package src;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -9,23 +8,16 @@ import java.util.stream.Collectors;
 
 public class Service {
     static class Ticket {
-        @JsonProperty("origin")
-        String origin;
-        @JsonProperty("destination")
-        String destination;
-        @JsonProperty("departure_time")
-        String departure_time;
-        @JsonProperty("arrival_time")
-        String arrival_time;
-        @JsonProperty("carrier")
-        String carrier;
-        @JsonProperty("price")
-        int price;
+        public String origin;
+        public String destination;
+        public String departure_time;
+        public String arrival_time;
+        public String carrier;
+        public int price;
     }
 
     static class Tickets {
-        @JsonProperty("tickets")
-        List<Ticket> tickets;
+        public List<Ticket> tickets;
     }
 
     public static void main(String[] args) throws Exception {
