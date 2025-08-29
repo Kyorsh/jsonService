@@ -20,8 +20,3 @@ javac -cp "lib/*" src/Service.java
 java -cp ".:lib/*" src.Service
 ```
 
-### Ошибка "UnrecognizedPropertyException"
-Программа настроена на игнорирование неизвестных полей в JSON, поэтому эта ошибка не должна возникать.
-
-### Файл не найден
-Убедитесь, что `tickets.json` находится в корневой директории проекта. 
