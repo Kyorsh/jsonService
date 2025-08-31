@@ -33,7 +33,7 @@ public class Service {
         Map<String, Long> minFlightTimes = new HashMap<>();
         for (Ticket t : tickets) {
             long duration = timeFormat.parse(t.arrival_time).getTime() - timeFormat.parse(t.departure_time).getTime();
-            duration = duration < 0 ? duration + 24 * 60 * 1000 : duration; // Учет перехода через сутки
+            duration = duration < 0 ? duration + 24 * 60 * 1000 : duration; 
             long minutes = duration / (1000 * 60);
             minFlightTimes.merge(t.carrier, minutes, Math::min);
         }
